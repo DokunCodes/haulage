@@ -94,49 +94,49 @@ $(function () {
     }());
 
     /*------- Google Map --------*/
-    (function () {
-        var LocationData = [
-            [49.2812668, -123.1035942, "26 E Hastings St, Vancouver"],
-            [49.2814064, -123.1025187, "71 E Hastings St, Vancouver"],
-            [49.2812336, -123.1020622, "122 E Hastings St, Vancouver"],
-            [49.2813564, -123.1012253, "138 E Hastings St, Vancouver"],
-            [49.2811625, -123.0985032, "242 E Hastings St, Vancouver"]
-        ];
+    // (function () {
+    //     var LocationData = [
+    //         [49.2812668, -123.1035942, "26 E Hastings St, Vancouver"],
+    //         [49.2814064, -123.1025187, "71 E Hastings St, Vancouver"],
+    //         [49.2812336, -123.1020622, "122 E Hastings St, Vancouver"],
+    //         [49.2813564, -123.1012253, "138 E Hastings St, Vancouver"],
+    //         [49.2811625, -123.0985032, "242 E Hastings St, Vancouver"]
+    //     ];
 
-        function initialize()
-        {
-            var map = new google.maps.Map(document.getElementById('map-canvas'));
-            var bounds = new google.maps.LatLngBounds();
-            var infowindow = new google.maps.InfoWindow();
+    //     function initialize()
+    //     {
+    //         var map = new google.maps.Map(document.getElementById('map-canvas'));
+    //         var bounds = new google.maps.LatLngBounds();
+    //         var infowindow = new google.maps.InfoWindow();
 
-            for (var i in LocationData)
-            {
-                var p = LocationData[i];
-                var latlng = new google.maps.LatLng(p[0], p[1]);
-                bounds.extend(latlng);
+    //         for (var i in LocationData)
+    //         {
+    //             var p = LocationData[i];
+    //             var latlng = new google.maps.LatLng(p[0], p[1]);
+    //             bounds.extend(latlng);
 
-                var marker = new google.maps.Marker({
-                    position: latlng,
-                    map: map,
-                    title: p[2]
-                });
+    //             var marker = new google.maps.Marker({
+    //                 position: latlng,
+    //                 map: map,
+    //                 title: p[2]
+    //             });
 
-                google.maps.event.addListener(marker, 'click', function () {
-                    infowindow.setContent(this.title);
-                    infowindow.open(map, this);
-                });
-            }
+    //             google.maps.event.addListener(marker, 'click', function () {
+    //                 infowindow.setContent(this.title);
+    //                 infowindow.open(map, this);
+    //             });
+    //         }
 
-            map.fitBounds(bounds);
-        }
+    //         map.fitBounds(bounds);
+    //     }
 
-        try {
-            google.maps.event.addDomListener(window, 'load', initialize);
-        } catch (e) {
-            console && console.error(e.message);
-        }
+    //     try {
+    //         google.maps.event.addDomListener(window, 'load', initialize);
+    //     } catch (e) {
+    //         console && console.error(e.message);
+    //     }
 
-    }());
+    // }());
 
     /*------- Calculator --------*/
     (function () {
@@ -197,3 +197,81 @@ $(function () {
 
 });
 
+$('.costForm').submit(function(event) {
+
+    event.preventDefault();
+
+    $('#sbmBtn').prop('value', 'Processing...').attr('disabled');
+
+
+    $.ajax({
+
+        type: 'post',
+
+        url: 'assets/scripts.php',
+
+        data: $('.costForm').serialize(),
+
+        success: function(response) {
+
+            $('#sbmBtn').text('Calculate Cost').removeAttr('disabled');
+
+           var result = $.parseJSON(response);
+
+            if(result[0]==="success")
+
+            { 
+                $('#tn').html(result[1]);
+                $('.calcBtn').hide();
+                $('#totCost').show();
+                $('#trackNo').show();
+                alert('Here is your tracking no: '+result[1])
+
+            }
+
+            else
+
+            {
+
+               // toastr["error"](result[1]);
+
+
+            }
+
+
+
+        },
+
+        error: function(response){
+
+           // toastr["error"]("Connection Time out. Try again later.");
+
+
+
+        }
+
+    });
+
+
+
+});
+
+function initAutocomplete() {
+
+          let input1 = document.getElementById('origin');
+          let autocomplete = new google.maps.places.Autocomplete(input1);
+          let input2 = document.getElementById('destination');
+          let autocomplete2 = new google.maps.places.Autocomplete(input2);
+
+    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+        let place = autocomplete.getPlace();
+        document.getElementById('originLat').value = place.geometry.location.lat();
+        document.getElementById('originLng').value = place.geometry.location.lng();
+    });
+
+    google.maps.event.addListener(autocomplete2, 'place_changed', function () {
+        let place = autocomplete2.getPlace();
+        document.getElementById('destLat').value = place.geometry.location.lat();
+        document.getElementById('destLng').value = place.geometry.location.lng();
+    });
+ }
